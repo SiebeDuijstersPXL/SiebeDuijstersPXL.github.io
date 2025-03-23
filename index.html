@@ -5,34 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-    window.location.href = "https://SNB4App-Frontend-ALB-144514105.us-east-1.elb.amazonaws.com";
+    window.location.href = "http://18.191.133.143/home";
+        async function checkRegion() {
+            try {
+                // Check US-EAST-1 first
+                let response = await fetch("https://SNB4App-Frontend-ALB-144514105.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
+                if (response.ok || response.type === "opaque") {
+                    window.location.href = "https://SNB4App-Frontend-ALB-144514105.us-east-1.elb.amazonaws.com";
+                    return;
+                }
+            } catch (e) {
+                console.log("us-east-1 is down, trying us-east-2...");
+            }
 
-        // async function checkRegion() {
-        //     try {
-        //         // Check US-EAST-1 first
-        //         let response = await fetch("https://SNB4App-Frontend-ALB-144514105.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
-        //         if (response.ok || response.type === "opaque") {
-        //             window.location.href = "https://SNB4App-Frontend-ALB-144514105.us-east-1.elb.amazonaws.com";
-        //             return;
-        //         }
-        //     } catch (e) {
-        //         console.log("us-east-1 is down, trying us-east-2...");
-        //     }
+            try {
+                // If us-east-1 fails, try us-east-2
+                let response2 = await fetch("https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
+                if (response2.ok || response2.type === "opaque") {
+                    window.location.href = "https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
+                    return;
+                }
+            } catch (e) {
+                console.log("Both regions are down!");
+                document.body.innerHTML = "<h1>Sorry, the service is currently unavailable.</h1>";
+            }
+        }
 
-        //     try {
-        //         // If us-east-1 fails, try us-east-2
-        //         let response2 = await fetch("https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
-        //         if (response2.ok || response2.type === "opaque") {
-        //             window.location.href = "https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
-        //             return;
-        //         }
-        //     } catch (e) {
-        //         console.log("Both regions are down!");
-        //         document.body.innerHTML = "<h1>Sorry, the service is currently unavailable.</h1>";
-        //     }
-        // }
-
-        // checkRegion();
+        //checkRegion();
     </script>
 </head>
 <body>
