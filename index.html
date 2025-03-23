@@ -22,9 +22,9 @@
 
             try {
                 // If us-east-1 fails, try us-east-2
-                let response2 = await fetch("https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
+                let response2 = await fetch("http://34.200.224.166/health", { mode: 'no-cors' });
                 if (response2.ok || response2.type === "opaque") {
-                    window.location.href = "https://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
+                    window.location.href = "http://34.200.224.166/home";
                     return;
                 }
             } catch (e) {
