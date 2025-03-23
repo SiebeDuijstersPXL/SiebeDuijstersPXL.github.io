@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -37,4 +37,58 @@
     </script>
 </head>
 
+</html>
+ -->
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        const servers = {
+            "us-east-1": "http://34.200.224.166",
+            "us-east-2": "http://18.191.133.143"
+        };
+
+        async function testLatency(url) {
+            let start = performance.now();
+            try {
+                await fetch(url + "/health", { mode: 'no-cors' });
+                return performance.now() - start;
+            } catch (e) {
+                return Infinity; // If the request fails, assume high latency
+            }
+        }
+
+        async function routeUser() {
+            let latencies = await Promise.all([
+                testLatency(servers["us-east-1"]),
+                testLatency(servers["us-east-2"])
+            ]);
+
+            let preferredRegion = latencies[0] < latencies[1] ? "us-east-1" : "us-east-2";
+            let backupRegion = preferredRegion === "us-east-1" ? "us-east-2" : "us-east-1";
+
+            if (latencies[0] === latencies[1]) {
+                preferredRegion = Math.random() > 0.5 ? "us-east-1" : "us-east-2"; // Random if equal
+            }
+
+            if (latencies[preferredRegion === "us-east-1" ? 0 : 1] !== Infinity) {
+                window.location.href = servers[preferredRegion];
+            } else if (latencies[backupRegion === "us-east-1" ? 0 : 1] !== Infinity) {
+                window.location.href = servers[backupRegion];
+            } else {
+                document.body.innerHTML = "<h1>All regions are down! Try again later.</h1>";
+            }
+        }
+
+        routeUser();
+    </script>
+</head>
+<body>
+    <h2>Testing server latency...</h2>
+</body>
 </html>
