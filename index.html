@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirectingg...</title>
     <script>
-    //window.location.href = "http://18.191.133.143/home"; //ip us-east-2 = good
-    //window.location.href = "http://34.200.224.166/home"; //ip us-east-1 = bad
 
         async function checkRegion() {
             try {
                 // Check US-EAST-2 first
-                let response = await fetch("http://18.191.133.143/health", { mode: 'no-cors' });
+                let response = await fetch("http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
                 if (response.ok || response.type === "opaque") {
                     window.location.href = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/home";
                     return;
@@ -22,7 +20,7 @@
 
             try {
                 // If us-east-2 fails, try us-east-1
-                let response2 = await fetch("SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
+                let response2 = await fetch("http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
                 if (response2.ok || response2.type === "opaque") {
                     window.location.href = "http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com";
                     return;
