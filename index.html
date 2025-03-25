@@ -11,6 +11,52 @@
                 // Check US-EAST-2 first
                 let response = await fetch("http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
                 if (response.ok || response.type === "opaque") {
+                    // Load content from US-EAST-2 without changing the URL
+                    document.body.innerHTML = "<h1>Connected to US-EAST-2</h1><p>Loading content from US-EAST-2...</p>";
+                    // Optionally load content dynamically using fetch or other methods here
+                    return;
+                }
+            } catch (e) {
+                console.log("us-east-2 is down, trying us-east-1...");
+            }
+
+            try {
+                // If us-east-2 fails, try us-east-1
+                let response2 = await fetch("http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
+                if (response2.ok || response2.type === "opaque") {
+                    // Load content from US-EAST-1 without changing the URL
+                    document.body.innerHTML = "<h1>Connected to US-EAST-1</h1><p>Loading content from US-EAST-1...</p>";
+                    // Optionally load content dynamically using fetch or other methods here
+                    return;
+                }
+            } catch (e) {
+                console.log("Both regions are down!");
+                document.body.innerHTML = "<h1>Sorry, the service is currently unavailable.</h1>";
+            }
+        }
+
+        checkRegion();
+    </script>
+</head>
+<body>
+    Checking regions...
+</body>
+
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+
+        async function checkRegion() {
+            try {
+                // Check US-EAST-2 first
+                let response = await fetch("http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
+                if (response.ok || response.type === "opaque") {
                     window.location.href = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/home";
                     return;
                 }
@@ -38,7 +84,12 @@
     redirecting...
 </body>
 
-</html>
+</html> -->
+
+
+
+
+
 <!--  <!DOCTYPE html>
 <html lang="en">
 <head>
