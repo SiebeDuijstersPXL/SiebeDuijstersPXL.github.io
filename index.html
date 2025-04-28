@@ -65,11 +65,16 @@
     window.onload = routeUser;
   </script> -->
   <script>
-
-      const iframe = document.createElement("iframe");
-      iframe.src = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
-      document.body.innerHTML = "";
-      document.body.appendChild(iframe);
+      window.onload = function() {
+          const iframe = document.createElement("iframe");
+          iframe.src = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
+          iframe.width = "100%";
+          iframe.height = "1000px"; // You can adjust this height
+          iframe.style.border = "none"; // Optional: no border
+          
+          document.body.innerHTML = ""; // Now it's safe to clear
+          document.body.appendChild(iframe);
+      };
   </script>
 </head>
 <body>
