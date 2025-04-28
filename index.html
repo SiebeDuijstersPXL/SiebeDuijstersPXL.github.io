@@ -17,7 +17,7 @@
       border: none;
     }
   </style>
-  <script>
+<!--   <script>
     const servers = {
      // us east staat uit "us-east-1": "http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com",
       "us-east-2": "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com"
@@ -63,8 +63,8 @@
     }
 
     window.onload = routeUser;
-  </script>
-<!--   <script> //manual test
+  </script> -->
+  <script> //manual test
       window.onload = function() {
           const iframe = document.createElement("iframe");
           iframe.src = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com";
@@ -75,7 +75,7 @@
           document.body.innerHTML = ""; // Now it's safe to clear
           document.body.appendChild(iframe);
       };
-  </script> -->
+  </script>
 </head>
 <body>
   <h2>Loading the best region for you...</h2>
