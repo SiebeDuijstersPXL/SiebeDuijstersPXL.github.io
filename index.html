@@ -1,143 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading...</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+  <script>
+    const servers = {
+      "us-east-1": "http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com",
+      "us-east-2": "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com"
+    };
 
-        async function checkRegion() {
-            try {
-                // Check US-EAST-2 first
-                let response = await fetch("http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
-                if (response.ok || response.type === "opaque") {
-                    // Load content from US-EAST-2 without changing the URL
-                    document.body.innerHTML = "<h1>Connected to US-EAST-2</h1><p>Loading content from US-EAST-2...</p>";
-                    // Optionally load content dynamically using fetch or other methods here
-                    return;
-                }
-            } catch (e) {
-                console.log("us-east-2 is down, trying us-east-1...");
-            }
+    async function testLatency(url) {
+      const start = performance.now();
+      try {
+        await fetch(url + "/health", { mode: 'no-cors' });
+        return performance.now() - start;
+      } catch (e) {
+        return Infinity; // Assume server is unreachable
+      }
+    }
 
-            try {
-                // If us-east-2 fails, try us-east-1
-                let response2 = await fetch("http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
-                if (response2.ok || response2.type === "opaque") {
-                    // Load content from US-EAST-1 without changing the URL
-                    document.body.innerHTML = "<h1>Connected to US-EAST-1</h1><p>Loading content from US-EAST-1...</p>";
-                    // Optionally load content dynamically using fetch or other methods here
-                    return;
-                }
-            } catch (e) {
-                console.log("Both regions are down!");
-                document.body.innerHTML = "<h1>Sorry, the service is currently unavailable.</h1>";
-            }
-        }
+    async function routeUser() {
+      const latencies = await Promise.all([
+        testLatency(servers["us-east-1"]),
+        testLatency(servers["us-east-2"])
+      ]);
 
-        checkRegion();
-    </script>
+      let preferredRegion = latencies[0] < latencies[1] ? "us-east-1" : "us-east-2";
+      let backupRegion = preferredRegion === "us-east-1" ? "us-east-2" : "us-east-1";
+
+      if (latencies[0] === latencies[1]) {
+        preferredRegion = Math.random() > 0.5 ? "us-east-1" : "us-east-2";
+      }
+
+      if (latencies[preferredRegion === "us-east-1" ? 0 : 1] !== Infinity) {
+        loadIframe(servers[preferredRegion]);
+      } else if (latencies[backupRegion === "us-east-1" ? 0 : 1] !== Infinity) {
+        loadIframe(servers[backupRegion]);
+      } else {
+        document.body.innerHTML = "<h1>All regions are down! Please try again later.</h1>";
+      }
+    }
+
+    function loadIframe(url) {
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      document.body.innerHTML = "";
+      document.body.appendChild(iframe);
+    }
+
+    window.onload = routeUser;
+  </script>
 </head>
 <body>
-    Checking regions...
+  <h2>Loading the best region for you...</h2>
 </body>
-
 </html>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <script>
-
-        async function checkRegion() {
-            try {
-                // Check US-EAST-2 first
-                let response = await fetch("http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/health", { mode: 'no-cors' });
-                if (response.ok || response.type === "opaque") {
-                    window.location.href = "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com/home";
-                    return;
-                }
-            } catch (e) {
-                console.log("us-east-1 is down, trying us-east-2...");
-            }
-
-            try {
-                // If us-east-2 fails, try us-east-1
-                let response2 = await fetch("http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com/health", { mode: 'no-cors' });
-                if (response2.ok || response2.type === "opaque") {
-                    window.location.href = "http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com";
-                    return;
-                }
-            } catch (e) {
-                console.log("Both regions are down!");
-                document.body.innerHTML = "<h1>Sorry, the service is currently unavailable.</h1>";
-            }
-        }
-
-        checkRegion();
-    </script>
-</head>
-<body>
-    redirecting...
-</body>
-
-</html> -->
-
-
-
-
-
-<!--  <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <script>
-        const servers = {
-            "us-east-1": "http://SNB4App-Frontend-ALB-2094695776.us-east-1.elb.amazonaws.com",
-            "us-east-2": "http://frontend-lb-1972727468.us-east-2.elb.amazonaws.com"
-        };
-
-        async function testLatency(url) {
-            let start = performance.now();
-            try {
-                await fetch(url + "/health", { mode: 'no-cors' });
-                return performance.now() - start;
-            } catch (e) {
-                return Infinity; // If the request fails, assume high latency
-            }
-        }
-
-        async function routeUser() {
-            let latencies = await Promise.all([
-                testLatency(servers["us-east-1"]),
-                testLatency(servers["us-east-2"])
-            ]);
-
-            let preferredRegion = latencies[0] < latencies[1] ? "us-east-1" : "us-east-2";
-            let backupRegion = preferredRegion === "us-east-1" ? "us-east-2" : "us-east-1";
-
-            if (latencies[0] === latencies[1]) {
-                preferredRegion = Math.random() > 0.5 ? "us-east-1" : "us-east-2"; // Random if equal
-            }
-
-            if (latencies[preferredRegion === "us-east-1" ? 0 : 1] !== Infinity) {
-                window.location.href = servers[preferredRegion];
-            } else if (latencies[backupRegion === "us-east-1" ? 0 : 1] !== Infinity) {
-                window.location.href = servers[backupRegion];
-            } else {
-                document.body.innerHTML = "<h1>All regions are down! Try again later.</h1>";
-            }
-        }
-
-        routeUser();
-    </script>
-</head>
-<body> -->
-<!--     <h2>Testing server latency...</h2>
-</body>
-</html> -->
